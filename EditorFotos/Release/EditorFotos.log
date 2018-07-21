@@ -1,0 +1,19 @@
+﻿Compilación iniciada a las 21/07/2018 3:52:37 p. m..
+     1>Proyecto "D:\Maestría\CG\Briggi\MostrarBMP\EditorFotos\EditorFotos\EditorFotos.vcxproj" en el nodo 2 (Build destinos).
+     1>ClCompile:
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\CL.exe /c /Zi /nologo /W3 /WX- /sdl /O2 /Oi /Oy- /GL /D WIN32 /D _WINDOWS /D NDEBUG /D _UNICODE /D UNICODE /D _AFXDLL /Gm- /EHsc /MD /GS /Gy /fp:precise /Zc:wchar_t /Zc:forScope /Yu"stdafx.h" /Fp"Release\EditorFotos.pch" /Fo"Release\\" /Fd"Release\vc120.pdb" /Gd /TP /analyze- /errorReport:prompt EditorFotosDlg.cpp
+         EditorFotosDlg.cpp
+       Link:
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"D:\Maestría\CG\Briggi\MostrarBMP\EditorFotos\Release\EditorFotos.exe" /INCREMENTAL:NO /NOLOGO /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /manifestinput:"C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\Include\Manifest\dpiaware.manifest" /DEBUG /PDB:"D:\Maestría\CG\Briggi\MostrarBMP\EditorFotos\Release\EditorFotos.pdb" /SUBSYSTEM:WINDOWS /OPT:REF /OPT:ICF /LTCG /TLBID:1 /ENTRY:"wWinMainCRTStartup" /DYNAMICBASE /NXCOMPAT /IMPLIB:"D:\Maestría\CG\Briggi\MostrarBMP\EditorFotos\Release\EditorFotos.lib" /MACHINE:X86 /SAFESEH Release\EditorFotos.res
+         Release\BMP.obj
+         Release\EditorFotos.obj
+         Release\EditorFotosDlg.obj
+         Release\stdafx.obj
+         Generando código
+         Generación de código finalizada
+         EditorFotos.vcxproj -> D:\Maestría\CG\Briggi\MostrarBMP\EditorFotos\Release\EditorFotos.exe
+     1>Compilación del proyecto terminada "D:\Maestría\CG\Briggi\MostrarBMP\EditorFotos\EditorFotos\EditorFotos.vcxproj" (Build destinos).
+
+Compilación correcta.
+
+Tiempo transcurrido 00:00:02.18
