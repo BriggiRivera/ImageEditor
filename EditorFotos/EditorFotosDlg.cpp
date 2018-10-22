@@ -7,6 +7,8 @@
 #include "EditorFotosDlg.h"
 #include "afxdialogex.h"
 #include "BMP.h"
+#define cimg_use_jpeg
+#include "CImg.h"
 #include "PixelRGB.h"
 #include <algorithm>
 #include <vector>
@@ -15,6 +17,8 @@
 #define new DEBUG_NEW
 #endif
 
+
+using namespace cimg_library;
 
 // Cuadro de diálogo CAboutDlg utilizado para el comando Acerca de
 class CAboutDlg : public CDialogEx
@@ -53,6 +57,7 @@ END_MESSAGE_MAP()
 CEditorFotosDlg::CEditorFotosDlg(CWnd* pParent /*=NULL*/)
 	: CDialogEx(CEditorFotosDlg::IDD, pParent)
 	, rutaArchivo(_T(""))
+	, escalas_wavelet(0)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 }
@@ -62,6 +67,9 @@ void CEditorFotosDlg::DoDataExchange(CDataExchange* pDX)
 	CDialogEx::DoDataExchange(pDX);
 	DDX_Control(pDX, groupID, groupArea);
 	DDX_Text(pDX, IDC_EDIT1, rutaArchivo);
+	DDX_Control(pDX, groupID2, groupArea2);
+	DDX_Text(pDX, CAMPO1, escalas_wavelet);
+	DDV_MinMaxInt(pDX, escalas_wavelet, 1, 64);
 }
 
 BEGIN_MESSAGE_MAP(CEditorFotosDlg, CDialogEx)
@@ -72,6 +80,9 @@ BEGIN_MESSAGE_MAP(CEditorFotosDlg, CDialogEx)
 	ON_WM_VSCROLL()
 	ON_WM_HSCROLL()
 	ON_WM_SIZE()
+//	ON_COMMAND(IDR_MENU1, &CEditorFotosDlg::OnOpciones)
+ON_COMMAND(IDR_MENU1, &CEditorFotosDlg::OnIdrMenu1)
+ON_COMMAND(ID_OPCIONES_WAVELET, &CEditorFotosDlg::OnOpcionesWavelet)
 END_MESSAGE_MAP()
 
 // Controladores de mensaje de CEditorFotosDlg
@@ -302,29 +313,70 @@ void CEditorFotosDlg::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 
 void CEditorFotosDlg::OnSize(UINT nType, int cx, int cy)
 {
-	/*
-	if (m_VScrollBar.GetSafeHwnd() && m_HScrollBar.GetSafeHwnd())
+}
+
+void CEditorFotosDlg::OnIdrMenu1()
+{
+}
+
+void mostrarImagen(CEditorFotosDlg* window, CStatic& area, int group, string fileName)
+{
+	brg::BMP image(fileName.c_str());
+
+	int size = image.getWidth() * image.getHeight();
+	CDC* cdc = area.GetDC();
+	CDC dcMem;
+	dcMem.CreateCompatibleDC(cdc);
+	vector<COLORREF> bitmap(size, RGB(255, 255, 255));
+
+	//window->GetDlgItem(group)->MoveWindow(0, 50, image.getWidth(), image.getHeight(), TRUE);
+
+	for (int i = 0; i<image.getWidth(); i++)
 	{
-		m_VScrollBar.SetWindowPos(NULL, cx - 20, 25, 20, iBottom, SWP_NOZORDER);
-		m_HScrollBar.SetWindowPos(NULL, iLeft, cy - 20, cx - cx / 2 - 20, 20, SWP_NOZORDER);
+		for (int j = 0; j<image.getHeight(); j++)
+		{
+			brg::PixelRGB& pixel = image.getPixel(i, j);
+			bitmap[(image.getHeight() - 1 - j)*image.getWidth() + i] = 0x00000000 | pixel.r << 16 | pixel.g << 8 | pixel.b;
+		}
 	}
 
-	//Horizontal Scroll Info Structure
-	m_horz.cbSize = sizeof(SCROLLINFO);
-	m_horz.fMask = SIF_ALL;
-	m_horz.nMin = 0;
-	m_horz.nMax = m_MaxWidth;
-	m_horz.nPage = rWnd.Width() / 10;
-	m_horz.nPos = m_iSrcX;
-	m_horz.nTrackPos = 0;
-	m_HScrollBar.SetScrollInfo(&m_horz);
-	//Vertical Scroll Info Structure
-	m_vert.cbSize = sizeof(SCROLLINFO);
-	m_vert.fMask = SIF_ALL;
-	m_vert.nMin = 0;
-	m_vert.nMax = m_MaxHeight;
-	m_vert.nPage = rWnd.Height() / 10;
-	m_vert.nPos = m_iSrcY;
-	m_vert.nTrackPos = 0;
-	m_VScrollBar.SetScrollInfo(&m_vert);*/
+	CBitmap bmp;
+	bmp.CreateBitmap(image.getWidth(), image.getHeight(), 1, 32, &bitmap[0]);
+	dcMem.SelectObject(&bmp);
+
+	cdc->TransparentBlt(
+		0, 0, image.getWidth(), image.getHeight(), &dcMem,
+		0, 0, image.getWidth(), image.getHeight(), RGB(255, 255, 255));
+
+	dcMem.DeleteDC();
+}
+
+/*
+	Maestria CS UNSA - Briggi Rivera Guillen
+	Prof. Juan Carlos Gutierrez Caceres
+*/
+
+void CEditorFotosDlg::OnOpcionesWavelet()
+{
+	// TODO: Agregue aquí su código de controlador de comandos
+	//MessageBoxW(L"Text Here", 0);
+
+	// TODO: Agregue aquí su código de controlador de notificación de control
+	UpdateData(true);
+	CStringA charstr(rutaArchivo);
+	string file = (const char *)charstr;
+	string fileSaved = file;
+	fileSaved.replace(fileSaved.find(".bmp"), sizeof("_procesada.bmp") - 1, "_procesada.bmp");
+
+	CImg<unsigned char> wavelet(file.c_str());
+	wavelet.resize(512, 512);
+	wavelet.haar(false, escalas_wavelet);
+	wavelet.save(fileSaved.c_str());
+	
+	CImg<unsigned char> imageInput(file.c_str());
+	imageInput.resize(512, 512);
+	imageInput.save(file.c_str());
+	
+	mostrarImagen(this, this->groupArea, groupID, file);
+	mostrarImagen(this, this->groupArea2, groupID2, fileSaved);
 }

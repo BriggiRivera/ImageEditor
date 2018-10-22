@@ -4,6 +4,7 @@
 
 #pragma once
 #include "afxwin.h"
+#include "afxmenubutton.h"
 
 
 // Cuadro de diálogo de CEditorFotosDlg
@@ -45,4 +46,11 @@ public:
 	void OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar);
 	void OnSize(UINT nType, int cx, int cy);
 	CString rutaArchivo;
+	CMFCMenuButton MenuGeneral;
+	afx_msg void OnBnClickedMenu();
+//	afx_msg void OnOpciones();
+	afx_msg void OnIdrMenu1();
+	afx_msg void OnOpcionesWavelet();
+	CStatic groupArea2;
+	int escalas_wavelet;
 };

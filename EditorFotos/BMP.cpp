@@ -55,5 +55,5 @@ int BMP::getHeight()
 
 PixelRGB& BMP::getPixel(int x, int y)
 {
-	return *(PixelRGB*)&dataImage[(y * (width * 3 + 1)) + x * 3];
+	return *(PixelRGB*)&dataImage[(y * (width * 3 + extraBytes)) + x * 3];
 }
