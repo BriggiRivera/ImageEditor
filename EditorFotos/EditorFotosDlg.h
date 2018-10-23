@@ -53,4 +53,5 @@ public:
 	afx_msg void OnOpcionesWavelet();
 	CStatic groupArea2;
 	int escalas_wavelet;
+	afx_msg void OnGlobalesFiltromediana();
 };

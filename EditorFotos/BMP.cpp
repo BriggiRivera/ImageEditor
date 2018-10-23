@@ -57,3 +57,10 @@ PixelRGB& BMP::getPixel(int x, int y)
 {
 	return *(PixelRGB*)&dataImage[(y * (width * 3 + extraBytes)) + x * 3];
 }
+
+void BMP::setPixel(PixelRGB& pixel, int x, int y)
+{
+	dataImage[(y * (width * 3 + extraBytes)) + x * 3] = pixel.b;
+	dataImage[(y * (width * 3 + extraBytes)) + x * 3 + 1] = pixel.g;
+	dataImage[(y * (width * 3 + extraBytes)) + x * 3 + 2] = pixel.r;
+}

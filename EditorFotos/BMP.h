@@ -1,3 +1,6 @@
+#ifndef BMP_H
+#define BMP_H
+
 #include "stdafx.h"
 #include <fstream>
 #include <iostream>
@@ -41,5 +44,9 @@ namespace brg
 		int getHeight();
 
 		PixelRGB& getPixel(int x, int y);
+
+		void setPixel(PixelRGB& pixel, int x, int y);
 	};
 }
+
+#endif
