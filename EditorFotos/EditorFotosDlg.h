@@ -54,4 +54,5 @@ public:
 	CStatic groupArea2;
 	int escalas_wavelet;
 	afx_msg void OnGlobalesFiltromediana();
+	afx_msg void OnGlobalEcualizaci32775();
 };

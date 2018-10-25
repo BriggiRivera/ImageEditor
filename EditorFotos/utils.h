@@ -8,7 +8,10 @@
 #include "BMP.h"
 #include "PixelRGB.h"
 #include <algorithm>
+#include <cmath>
 #include <vector>
+
+using namespace std;
 
 brg::PixelRGB getMedian(brg::BMP* image, int x, int y, int neighbourhood) {
 	int iniX = x - neighbourhood / 2;
@@ -38,6 +41,37 @@ brg::PixelRGB getMedian(brg::BMP* image, int x, int y, int neighbourhood) {
 	int pos = neighbourhood * neighbourhood / 2;
 
 	return brg::PixelRGB(b[pos], g[pos], r[pos]);
+}
+
+int** crearMatriz(int width, int height)
+{
+	int** matriz = new int*[width];
+	for (int index = 0; index < width; index++) {
+		matriz[index] = new int[height];
+	}
+	return matriz;
+}
+
+int** crearMatrizEscalaGrises(brg::BMP* image) {
+	int** matriz = crearMatriz(image->getWidth(), image->getHeight());
+
+	for (int y = 0; y < image->getHeight() ;y++)
+	{
+		for (int x = 0; x < image->getWidth(); x++) {
+			brg::PixelRGB& pixel = image->getPixel(x, y);
+			matriz[x][y] = ((0.3 * pixel.r) + (0.59 * pixel.g) + (0.11 * pixel.b));//sqrt(pixel.r * pixel.r + pixel.g * pixel.g + pixel.b * pixel.b);
+		}
+	}
+
+	return matriz;
+}
+
+void destruirMatriz(int** matriz, int width)
+{
+	for (int index = 0; index < width; index++) {
+		delete[] matriz[index];
+	}
+	delete[] matriz;
 }
 
 #endif

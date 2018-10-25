@@ -85,6 +85,7 @@ BEGIN_MESSAGE_MAP(CEditorFotosDlg, CDialogEx)
 ON_COMMAND(IDR_MENU1, &CEditorFotosDlg::OnIdrMenu1)
 ON_COMMAND(ID_OPCIONES_WAVELET, &CEditorFotosDlg::OnOpcionesWavelet)
 ON_COMMAND(ID_GLOBALES_FILTROMEDIANA, &CEditorFotosDlg::OnGlobalesFiltromediana)
+ON_COMMAND(ID_GLOBAL_ECUALIZACI32775, &CEditorFotosDlg::OnGlobalEcualizaci32775)
 END_MESSAGE_MAP()
 
 // Controladores de mensaje de CEditorFotosDlg
@@ -451,6 +452,7 @@ void CEditorFotosDlg::OnGlobalesFiltromediana()
 	CImg<unsigned char> imageInput(file.c_str());
 	imageInput.resize(512, 512);
 	imageInput.save(fileSaved.c_str());
+	imageInput.save(file.c_str());
 
 	brg::BMP* image = new brg::BMP(file.c_str());
 
@@ -465,5 +467,67 @@ void CEditorFotosDlg::OnGlobalesFiltromediana()
 
 	mostrarImagen(this, this->groupArea, groupID, file);
 	mostrarImagen(this, this->groupArea2, groupID2, image);
+	delete(image);
+}
+
+
+void CEditorFotosDlg::OnGlobalEcualizaci32775()
+{
+	UpdateData(true);
+	CStringA charstr(rutaArchivo);
+	string file = (const char *)charstr;
+	string fileSaved = file;
+	fileSaved.replace(fileSaved.find(".bmp"), sizeof("_procesadaHist.bmp") - 1, "_procesadaHist.bmp");
+
+	CImg<unsigned char> imageInput(file.c_str());
+	imageInput.resize(512, 512);
+	imageInput.save(fileSaved.c_str());
+
+	brg::BMP* image = new brg::BMP(file.c_str());
+	
+	//Crear Matrix en escala de grises
+	int** input = crearMatrizEscalaGrises(image);
+
+	//Calcular el histograma de la imagen en escala de grises
+	int histograma[256];
+	for (int index = 0; index < 256; index++)
+	{
+		histograma[index] = 0;
+	}
+
+	for (int y = 0; y < image->getHeight(); y++)
+	{
+		for (int x = 0; x < image->getWidth(); x++) {
+			histograma[input[x][y]]++;
+		}
+	}
+
+	//Calcular el histograma de la imagen acumulado
+	for (int index = 1; index < 256; index++)
+	{
+		histograma[index] += histograma[index-1];	
+	}
+
+	int accumMinimum = histograma[0];
+	//Generar Look up Table
+	int lookUp[256];
+	for (int index = 0; index < 256; index++)
+	{
+		lookUp[index] = floor(255 * (histograma[index] - accumMinimum) / (image->getHeight() * image->getWidth() - accumMinimum));
+	}
+
+	int tmp;
+	//Ecualizar Imagen
+	for (int y = 0; y < image->getHeight(); y++)
+	{
+		for (int x = 0; x < image->getWidth(); x++) {
+			tmp = lookUp[input[x][y]];
+			image->setPixel(brg::PixelRGB(tmp, tmp, tmp), x, y);
+		}
+	}
+
+	mostrarImagen(this, this->groupArea, groupID, file);
+	mostrarImagen(this, this->groupArea2, groupID2, image);
+	destruirMatriz(input, image->getWidth());
 	delete(image);
 }
