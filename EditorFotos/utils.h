@@ -10,8 +10,57 @@
 #include <algorithm>
 #include <cmath>
 #include <vector>
+#define cimg_use_jpeg
+#include "CImg.h"
+#include <cstdio>
 
 using namespace std;
+using namespace cimg_library;
+
+void operacionConvolucion(string input, string output, vector<vector<float>>& mask, brg::BMP*& bmpInput, brg::BMP*& bmpOutput)
+{
+	CImg<unsigned char> imageInput(input.c_str());
+	imageInput.resize(512, 512);
+	imageInput.save(output.c_str());
+	imageInput.save(input.c_str());
+
+	bmpInput = new brg::BMP(input.c_str());
+	bmpOutput = new brg::BMP(output.c_str());
+
+	int maskMiddle = mask.size() / 2;
+	int x0 = maskMiddle;
+	int x1 = bmpInput->getWidth() - maskMiddle;
+	int y0 = maskMiddle;
+	int y1 = bmpInput->getHeight() - maskMiddle;
+
+	for (int y = y0; y < y1; y++)
+	{
+		for (int x = x0; x < x1; x++)
+		{
+			int r = 0,g = 0,b = 0;
+			brg::PixelRGB& center = bmpInput->getPixel(x, y);
+			int i0 = x - maskMiddle;
+			int i1 = x + maskMiddle;
+			int j0 = y - maskMiddle;
+			int j1 = y + maskMiddle;
+			
+			for (int i = i0, n = 0; i <= i1; i++, n++)
+			{
+				for (int j = j0, m = 0; j <= j1; j++, m++)
+				{
+					brg::PixelRGB& pixel = bmpInput->getPixel(i, j);
+					r += mask[n][m] * pixel.r;
+					g += mask[n][m] * pixel.g;
+					b += mask[n][m] * pixel.b;
+				}
+			}
+			b = b < 0 || b > 255 ? center.b : b;
+			r = r < 0 || r > 255 ? center.r : r;
+			g = g < 0 || g > 255 ? center.g : g;
+			bmpOutput->setPixel(brg::PixelRGB(b, g, r), x, y);
+		}
+	}
+}
 
 brg::PixelRGB getMedian(brg::BMP* image, int x, int y, int neighbourhood) {
 	int iniX = x - neighbourhood / 2;
@@ -72,6 +121,11 @@ void destruirMatriz(int** matriz, int width)
 		delete[] matriz[index];
 	}
 	delete[] matriz;
+}
+
+void borrarImagen(string path)
+{
+	remove(path.c_str());
 }
 
 #endif

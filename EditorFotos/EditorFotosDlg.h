@@ -55,4 +55,6 @@ public:
 	int escalas_wavelet;
 	afx_msg void OnGlobalesFiltromediana();
 	afx_msg void OnGlobalEcualizaci32775();
+	afx_msg void OnGlobalPerfilado();
+	afx_msg void OnGlobalSuavizado();
 };

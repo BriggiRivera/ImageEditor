@@ -86,6 +86,8 @@ ON_COMMAND(IDR_MENU1, &CEditorFotosDlg::OnIdrMenu1)
 ON_COMMAND(ID_OPCIONES_WAVELET, &CEditorFotosDlg::OnOpcionesWavelet)
 ON_COMMAND(ID_GLOBALES_FILTROMEDIANA, &CEditorFotosDlg::OnGlobalesFiltromediana)
 ON_COMMAND(ID_GLOBAL_ECUALIZACI32775, &CEditorFotosDlg::OnGlobalEcualizaci32775)
+ON_COMMAND(ID_GLOBAL_PERFILADO, &CEditorFotosDlg::OnGlobalPerfilado)
+ON_COMMAND(ID_GLOBAL_SUAVIZADO, &CEditorFotosDlg::OnGlobalSuavizado)
 END_MESSAGE_MAP()
 
 // Controladores de mensaje de CEditorFotosDlg
@@ -418,9 +420,6 @@ brg::PixelRGB getMedian(brg::BMP image, int x, int y, int neighbourhood) {
 
 void CEditorFotosDlg::OnOpcionesWavelet()
 {
-	// TODO: Agregue aquí su código de controlador de comandos
-	//MessageBoxW(L"Text Here", 0);
-
 	UpdateData(true);
 	CStringA charstr(rutaArchivo);
 	string file = (const char *)charstr;
@@ -460,16 +459,15 @@ void CEditorFotosDlg::OnGlobalesFiltromediana()
 	{
 		for (int x = 1; x < image->getWidth()-1; x++)
 		{
-			brg::PixelRGB pixel = getMedian(image, x, y, 3);
-			image->setPixel(pixel, x, y);
+			image->setPixel(getMedian(image, x, y, 3), x, y);
 		}
 	}
 
 	mostrarImagen(this, this->groupArea, groupID, file);
 	mostrarImagen(this, this->groupArea2, groupID2, image);
 	delete(image);
+	borrarImagen(fileSaved);
 }
-
 
 void CEditorFotosDlg::OnGlobalEcualizaci32775()
 {
@@ -530,4 +528,57 @@ void CEditorFotosDlg::OnGlobalEcualizaci32775()
 	mostrarImagen(this, this->groupArea2, groupID2, image);
 	destruirMatriz(input, image->getWidth());
 	delete(image);
+}
+
+void CEditorFotosDlg::OnGlobalPerfilado()
+{
+	UpdateData(true);
+	CStringA charstr(rutaArchivo);
+	string input = (const char *)charstr;
+	string output = input;
+	output.replace(output.find(".bmp"), sizeof("_procesadaPerfilado.bmp") - 1, "_procesadaPerfilado.bmp");
+
+	vector<vector<float>> mask = { 
+		{ -1, -1, -1 },
+		{ -1, 9 , -1 },
+		{ -1, -1, -1 }
+	};
+
+	brg::BMP* imageInput = NULL;
+	brg::BMP* imageOutput = NULL;
+	operacionConvolucion(input, output, mask, imageInput, imageOutput);
+
+	mostrarImagen(this, this->groupArea, groupID, imageInput);
+	mostrarImagen(this, this->groupArea2, groupID2, imageOutput);
+
+	borrarImagen(output);
+	delete(imageInput);
+	delete(imageOutput);
+}
+
+
+void CEditorFotosDlg::OnGlobalSuavizado()
+{
+	UpdateData(true);
+	CStringA charstr(rutaArchivo);
+	string input = (const char *)charstr;
+	string output = input;
+	output.replace(output.find(".bmp"), sizeof("_procesadaPerfilado.bmp") - 1, "_procesadaPerfilado.bmp");
+
+	vector<vector<float>> mask = {
+		{ 1 / 9.f, 1 / 9.f, 1 / 9.f },
+		{ 1 / 9.f, 1 / 9.f, 1 / 9.f },
+		{ 1 / 9.f, 1 / 9.f, 1 / 9.f }
+	};
+
+	brg::BMP* imageInput = NULL;
+	brg::BMP* imageOutput = NULL;
+	operacionConvolucion(input, output, mask, imageInput, imageOutput);
+
+	mostrarImagen(this, this->groupArea, groupID, imageInput);
+	mostrarImagen(this, this->groupArea2, groupID2, imageOutput);
+
+	borrarImagen(output);
+	delete(imageInput);
+	delete(imageOutput);
 }
