@@ -88,6 +88,8 @@ ON_COMMAND(ID_GLOBALES_FILTROMEDIANA, &CEditorFotosDlg::OnGlobalesFiltromediana)
 ON_COMMAND(ID_GLOBAL_ECUALIZACI32775, &CEditorFotosDlg::OnGlobalEcualizaci32775)
 ON_COMMAND(ID_GLOBAL_PERFILADO, &CEditorFotosDlg::OnGlobalPerfilado)
 ON_COMMAND(ID_GLOBAL_SUAVIZADO, &CEditorFotosDlg::OnGlobalSuavizado)
+ON_COMMAND(ID_GLOBAL_CAMBIODEPROYECCI32778, &CEditorFotosDlg::OnGlobalCambiodeproyecci32778)
+ON_COMMAND(ID_GLOBAL_INTERPOLACI32779, &CEditorFotosDlg::OnGlobalInterpolaci32779)
 END_MESSAGE_MAP()
 
 // Controladores de mensaje de CEditorFotosDlg
@@ -574,6 +576,59 @@ void CEditorFotosDlg::OnGlobalSuavizado()
 	brg::BMP* imageInput = NULL;
 	brg::BMP* imageOutput = NULL;
 	operacionConvolucion(input, output, mask, imageInput, imageOutput);
+
+	mostrarImagen(this, this->groupArea, groupID, imageInput);
+	mostrarImagen(this, this->groupArea2, groupID2, imageOutput);
+
+	borrarImagen(output);
+	delete(imageInput);
+	delete(imageOutput);
+}
+
+
+void CEditorFotosDlg::OnGlobalCambiodeproyecci32778()
+{
+	UpdateData(true);
+	CStringA charstr(rutaArchivo);
+	string input = (const char *)charstr;
+	string output = input;
+	output.replace(output.find(".bmp"), sizeof("_procesadaCambioProyeccion.bmp") - 1, "_procesadaCambioProyeccion.bmp");
+
+	vector<vector<double>> P = {
+		{ 0.6, .5, 0 },
+		{ .15, 0.6, 0 },
+		{ 0, 0, 1 }
+	};
+
+	brg::BMP* imageInput = NULL;
+	brg::BMP* imageOutput = NULL;
+	projectiveTransformation(input, output, imageInput, imageOutput, P);
+
+	mostrarImagen(this, this->groupArea, groupID, imageInput);
+	mostrarImagen(this, this->groupArea2, groupID2, imageOutput);
+	
+	borrarImagen(output);
+	delete(imageInput);
+	delete(imageOutput);
+}
+
+void CEditorFotosDlg::OnGlobalInterpolaci32779()
+{
+	UpdateData(true);
+	CStringA charstr(rutaArchivo);
+	string input = (const char *)charstr;
+	string output = input;
+	output.replace(output.find(".bmp"), sizeof("_procesadaBilineal.bmp") - 1, "_procesadaPerfilado.bmp");
+
+	vector<vector<double>> P = {
+		{ 2.1052631578947367, -1.7543859649122806, 0 },
+		{ -0.5263157894736842, 2.1052631578947367, 0 },
+		{ 0, 0, 1 }
+	};
+
+	brg::BMP* imageInput = NULL;
+	brg::BMP* imageOutput = NULL;
+	projectiveTransformationBilinealInterpolation(input, output, imageInput, imageOutput, P);
 
 	mostrarImagen(this, this->groupArea, groupID, imageInput);
 	mostrarImagen(this, this->groupArea2, groupID2, imageOutput);

@@ -57,4 +57,6 @@ public:
 	afx_msg void OnGlobalEcualizaci32775();
 	afx_msg void OnGlobalPerfilado();
 	afx_msg void OnGlobalSuavizado();
+	afx_msg void OnGlobalCambiodeproyecci32778();
+	afx_msg void OnGlobalInterpolaci32779();
 };
